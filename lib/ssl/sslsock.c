@@ -367,6 +367,8 @@ ssl_DestroySocketContents(sslSocket *ss)
 	ss->ephemeralECDHKeyPair = NULL;
     }
     SECITEM_FreeItem(&ss->opt.nextProtoNego, PR_FALSE);
+    // TODO This assertion is failing in many tests.
+    // Is it legitimate?
     PORT_Assert(!ss->xtnData.sniNameArr);
     if (ss->xtnData.sniNameArr) {
         PORT_Free(ss->xtnData.sniNameArr);
@@ -2853,6 +2855,8 @@ ssl_NewSocket(PRBool makeLocks, SSLProtocolVariant protocolVariant)
 	ssl2_InitSocketCipherSuites(ss);
 	ssl3_InitSocketCipherSuites(ss);
 	PR_INIT_CLIST(&ss->ssl3.hs.lastMessageFlight);
+  uint16ArrayInit(&ss->xtnData.advertised);
+  uint16ArrayInit(&ss->xtnData.negotiated);
 
 	if (makeLocks) {
 	    status = ssl_MakeLocks(ss);

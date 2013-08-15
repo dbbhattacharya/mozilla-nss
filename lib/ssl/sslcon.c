@@ -3119,7 +3119,7 @@ ssl2_BeginClientHandshake(sslSocket *ss)
      * been called, which ssl3_StartHandshakeHash took care for us above.
      */
     xtnData = &ss->xtnData;
-    xtnData->advertised[xtnData->numAdvertised++] = ssl_renegotiation_info_xtn;
+    uint16ArrayAppend(&xtnData->advertised, ssl_renegotiation_info_xtn);
 
     /* Setup to receive servers hello message */
     ssl_GetRecvBufLock(ss);

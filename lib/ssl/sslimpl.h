@@ -195,8 +195,8 @@ typedef sslSessionID *(*sslSessionIDLookupFunc)(const PRIPv6Addr    *addr,
 /* registerable callback function that either appends extension to buffer
  * or returns length of data that it would have appended.
  */
-typedef PRInt32 (*ssl3HelloExtensionSenderFunc)(sslSocket *ss, PRBool append,
-						PRUint32 maxBytes);
+typedef PRInt32 (*SSL_HelloExtensionSenderFunc)(void *context, PRFileDesc *fd,
+						 PRBool append, PRUint32 maxBytes);
 
 /* registerable callback function that handles a received extension, 
  * of the given type.
@@ -208,7 +208,8 @@ typedef SECStatus (* ssl3HelloExtensionHandlerFunc)(sslSocket *ss,
 /* row in a table of hello extension senders */
 typedef struct {
     PRInt32                      ex_type;
-    ssl3HelloExtensionSenderFunc ex_sender;
+    SSL_HelloExtensionSenderFunc ex_sender;
+    void *context;
 } ssl3HelloExtensionSender;
 
 /* row in a table of hello extension handlers */
@@ -217,13 +218,43 @@ typedef struct {
     ssl3HelloExtensionHandlerFunc ex_handler;
 } ssl3HelloExtensionHandler;
 
+typedef SECStatus (*SSL_HelloExtensionHandlerFunc)(void *context, PRFileDesc *fd,
+                                                    PRUint16 ex_type, SECItem *data);
+
+/* A client-supplied Hello Extension handler */
+typedef struct {
+    PRInt32 ex_type; // The extension number
+    SSL_HelloExtensionHandlerFunc ex_handler; // Function pointer
+    void *context; // Client-supplied pointer that is passed to handler.
+} ssl3CustomHelloExtensionHandler;
+
+/* A full set of Hello Extension handlers, including both
+   builtin handlers and client-supplied handlers */
+typedef struct {
+    const ssl3HelloExtensionHandler *builtin_handlers;
+    PRInt32 builtin_len;
+    ssl3CustomHelloExtensionHandler *custom_handlers;
+    PRInt32 custom_len;
+    PRInt32 custom_alloced_len;
+} ssl3HelloExtensionHandlerCollection;
+
+/* A full set of Hello Extension senders. */
+typedef struct {
+    ssl3HelloExtensionSender *senders;
+    PRInt32 len;
+    PRInt32 alloc_len;
+} ssl3HelloSenderCollection;
+
+
+#define INITIAL_CUSTOM_HANDLERS_ARR_SIZE 4
+
 extern SECStatus 
-ssl3_RegisterServerHelloExtensionSender(sslSocket *ss, PRUint16 ex_type,
-				        ssl3HelloExtensionSenderFunc cb);
+ssl3_RegisterServerHelloExtensionSender(void *context, sslSocket *ss, PRUint16 ex_type,
+				        SSL_HelloExtensionSenderFunc cb);
 
 extern PRInt32
 ssl3_CallHelloExtensionSenders(sslSocket *ss, PRBool append, PRUint32 maxBytes,
-                               const ssl3HelloExtensionSender *sender);
+                               const ssl3HelloSenderCollection *senders);
 
 /* Socket ops */
 struct sslSocketOpsStr {
@@ -744,14 +775,18 @@ typedef enum {
 typedef struct TLSExtensionDataStr       TLSExtensionData;
 typedef struct SessionTicketDataStr      SessionTicketData;
 
+typedef struct {
+    PRUint16 *data;
+    PRUint16 alloc_len;
+    PRUint16 len;
+} Uint16Array;
+
 struct TLSExtensionDataStr {
     /* registered callbacks that send server hello extensions */
-    ssl3HelloExtensionSender serverSenders[SSL_MAX_EXTENSIONS];
+    ssl3HelloSenderCollection serverSenders;    // TODO Where to call init?
     /* Keep track of the extensions that are negotiated. */
-    PRUint16 numAdvertised;
-    PRUint16 numNegotiated;
-    PRUint16 advertised[SSL_MAX_EXTENSIONS];
-    PRUint16 negotiated[SSL_MAX_EXTENSIONS];
+    Uint16Array advertised;
+    Uint16Array negotiated;
 
     /* SessionTicket Extension related data. */
     PRBool ticketTimestampVerified;
@@ -1678,14 +1713,14 @@ extern SECStatus ssl3_ServerHandleSessionTicketXtn(sslSocket *ss,
  * Note that not all extension senders are exposed here; only those that
  * that need exposure.
  */
-extern PRInt32 ssl3_SendSessionTicketXtn(sslSocket *ss, PRBool append,
-			PRUint32 maxBytes);
+extern PRInt32 ssl3_SendSessionTicketXtn(void *context, PRFileDesc *fd, PRBool append,
+                                         PRUint32 maxBytes);
 
 /* ClientHello and ServerHello extension senders.
  * The code is in ssl3ext.c.
  */
-extern PRInt32 ssl3_SendServerNameXtn(sslSocket *ss, PRBool append,
-                     PRUint32 maxBytes);
+extern PRInt32 ssl3_SendServerNameXtn(void *context, PRFileDesc *fd, PRBool append,
+                                      PRUint32 maxBytes);
 
 /* Assigns new cert, cert chain and keys to ss->serverCerts
  * struct. If certChain is NULL, tries to find one. Aborts if
@@ -1846,5 +1881,10 @@ extern int __cdecl _getpid(void);
 #else
 #define SSL_GETPID() 0
 #endif
+
+
+
+void uint16ArrayInit(Uint16Array *arr);
+void uint16ArrayAppend(Uint16Array *arr, PRUint16 new_data);
 
 #endif /* __sslimpl_h_ */

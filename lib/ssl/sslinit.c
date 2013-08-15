@@ -17,6 +17,8 @@ static int ssl_inited = 0;
 SECStatus
 ssl_Init(void)
 {
+// TODO(DJ) is this always called before anything else?
+// Consider doing init work here instad of EnsureInit stuff.
     if (!ssl_inited) {
 	if (ssl_InitializePRErrorTable() != SECSuccess) {
 	    PORT_SetError(SEC_ERROR_NO_MEMORY);
