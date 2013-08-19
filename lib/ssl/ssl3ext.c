@@ -2464,10 +2464,6 @@ SSL_SetCustomClientHelloTLS(PRInt32 ex_type,
 
 
 
-// TODO Expose needed functionality of sslSocket to a client who only has the
-// corresponding PRFileDesc. Right now, nothing the provided sender can't do
-// anything, including actually sending data, since that functionality is
-// exposed through the private sslSocket*
 /* Register a ServerHello extension sender for the TLS connection associated
    with fd.
  */

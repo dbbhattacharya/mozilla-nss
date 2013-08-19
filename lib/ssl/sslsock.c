@@ -367,8 +367,6 @@ ssl_DestroySocketContents(sslSocket *ss)
 	ss->ephemeralECDHKeyPair = NULL;
     }
     SECITEM_FreeItem(&ss->opt.nextProtoNego, PR_FALSE);
-    // TODO This assertion is failing in many tests.
-    // Is it legitimate?
     PORT_Assert(!ss->xtnData.sniNameArr);
     if (ss->xtnData.sniNameArr) {
         PORT_Free(ss->xtnData.sniNameArr);
