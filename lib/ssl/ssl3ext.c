@@ -469,7 +469,7 @@ ssl3_ExtensionSenderCollectionInit(ssl3HelloSenderCollection *coll,
                          const ssl3HelloExtensionSender *builtin,
                          PRInt32 builtin_bytes) {
     coll->alloc_len = coll->len = builtin_bytes / sizeof(*builtin);
-    clientHelloSendersTLS.senders = PORT_Alloc(builtin_bytes);
+    coll->senders = PORT_Alloc(builtin_bytes);
     PORT_Memcpy(coll->senders, builtin, builtin_bytes);
 }
 
