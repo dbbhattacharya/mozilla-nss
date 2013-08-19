@@ -1863,6 +1863,8 @@ ssl3_TLSPRFWithMasterSecret(ssl3CipherSpec *spec,
                             const unsigned char *val, unsigned int valLen,
                             unsigned char *out, unsigned int outLen);
 
+void ssl3_ExtInit();
+
 #ifdef TRACE
 #define SSL_TRACE(msg) ssl_Trace msg
 #else

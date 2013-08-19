@@ -20,6 +20,7 @@ ssl_Init(void)
 // TODO(DJ) is this always called before anything else?
 // Consider doing init work here instad of EnsureInit stuff.
     if (!ssl_inited) {
+        ssl3_ExtInit();
 	if (ssl_InitializePRErrorTable() != SECSuccess) {
 	    PORT_SetError(SEC_ERROR_NO_MEMORY);
 	    return (SECFailure);

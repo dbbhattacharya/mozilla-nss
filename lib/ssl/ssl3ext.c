@@ -256,7 +256,6 @@ static const ssl3HelloExtensionHandler builtinClientHelloHandlers[] = {
     { ssl_use_srtp_xtn,           &ssl3_HandleUseSRTPXtn },
     { ssl_cert_status_xtn,        &ssl3_ServerHandleStatusRequestXtn },
     { ssl_signature_algorithms_xtn, &ssl3_ServerHandleSigAlgsXtn },
-    { -1, NULL } // TODO delete? (including below)
 };
 static ssl3HelloExtensionHandlerCollection clientHelloHandlers = {
     builtinClientHelloHandlers, -1/* needs to be computed */, NULL, 0, 0
@@ -273,7 +272,6 @@ static const ssl3HelloExtensionHandler builtinServerHelloHandlersTLS[] = {
     { ssl_next_proto_nego_xtn,    &ssl3_ClientHandleNextProtoNegoXtn },
     { ssl_use_srtp_xtn,           &ssl3_HandleUseSRTPXtn },
     { ssl_cert_status_xtn,        &ssl3_ClientHandleStatusRequestXtn },
-    { -1, NULL }
 };
 static ssl3HelloExtensionHandlerCollection serverHelloHandlersTLS = {
     builtinServerHelloHandlersTLS, -1, NULL, 0, 0
@@ -281,7 +279,6 @@ static ssl3HelloExtensionHandlerCollection serverHelloHandlersTLS = {
 
 static const ssl3HelloExtensionHandler builtinServerHelloHandlersSSL3[] = {
     { ssl_renegotiation_info_xtn, &ssl3_HandleRenegotiationInfoXtn },
-    { -1, NULL }
 };
 static ssl3HelloExtensionHandlerCollection serverHelloHandlersSSL3 = {
     builtinServerHelloHandlersSSL3, -1, NULL, 0, 0
@@ -2375,6 +2372,13 @@ loser:
 }
 
 
+/* Initialization needed for this file.
+   Should only be called by ssl_Init. */
+void
+ssl3_ExtInit() {
+    hello_extension_collection_init(&serverHelloHandlersTLS);
+    hello_extension_collection_init(&serverHelloHandlersSSL3);
+}
 
 
 // TODO put these functions in appropriate header and in the .def file.
