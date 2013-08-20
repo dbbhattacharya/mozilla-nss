@@ -2383,53 +2383,58 @@ ssl3_ExtInit() {
 
 // TODO put these functions in appropriate header and in the .def file.
 
-SECStatus SSL_AppendHandshake(PRFileDesc *fd, const void *void_src,
-                              PRInt32 bytes) {
+SECStatus
+SSL_AppendHandshake(PRFileDesc *fd, const void *void_src,
+                    PRInt32 bytes) {
     sslSocket *ss = ssl_FindSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshake(ss, void_src, bytes);
 }
-SECStatus SSL_AppendHandshakeHeader(PRFileDesc *fd,
-                                    SSL3HandshakeType t, PRUint32 length) {
+SECStatus
+SSL_AppendHandshakeHeader(PRFileDesc *fd,
+                          SSL3HandshakeType t, PRUint32 length) {
     sslSocket *ss = ssl_FindSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshakeHeader(ss, t, length);
 }
 
-SECStatus SSL_AppendHandshakeNumber(PRFileDesc *fd, PRInt32 num,
-                                     PRInt32 lenSize) {
+SECStatus
+SSL_AppendHandshakeNumber(PRFileDesc *fd, PRInt32 num, PRInt32 lenSize) {
     sslSocket *ss = ssl_FindSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshakeNumber(ss, num, lenSize);
 }
-SECStatus SSL_AppendHandshakeVariable(PRFileDesc *fd, const SSL3Opaque *src,
-                                      PRInt32 bytes, PRInt32 lenSize) {
+SECStatus
+SSL_AppendHandshakeVariable(PRFileDesc *fd, const SSL3Opaque *src,
+                            PRInt32 bytes, PRInt32 lenSize) {
     sslSocket *ss = ssl_FindSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshakeVariable(ss, src, bytes, lenSize);
 }
 
-SECStatus SSL_ConsumeHandshake(PRFileDesc *fd, void *v, PRInt32 bytes,
-                                SSL3Opaque **b, PRUint32 *length) {
+SECStatus
+SSL_ConsumeHandshake(PRFileDesc *fd, void *v, PRInt32 bytes,
+                     SSL3Opaque **b, PRUint32 *length) {
     sslSocket *ss = ssl_FindSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_ConsumeHandshake(ss, v, bytes, b, length);
 }
-PRInt32 SSL_ConsumeHandshakeNumber(PRFileDesc *fd, PRInt32 bytes,
-                                   SSL3Opaque **b, PRUint32 *length) {
+PRInt32
+SSL_ConsumeHandshakeNumber(PRFileDesc *fd, PRInt32 bytes,
+                           SSL3Opaque **b, PRUint32 *length) {
     sslSocket *ss = ssl_FindSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_ConsumeHandshakeNumber(ss, bytes, b, length);
 }
-SECStatus SSL_ConsumeHandshakeVariable(PRFileDesc *fd, SECItem *i,
-                                       PRInt32 bytes, SSL3Opaque **b,
-                                       PRUint32 *length) {
+SECStatus
+SSL_ConsumeHandshakeVariable(PRFileDesc *fd, SECItem *i, PRInt32 bytes,
+                             SSL3Opaque **b, PRUint32 *length) {
     sslSocket *ss = ssl_FindSocket(fd);
     PORT_Assert(ss != NULL);
 
