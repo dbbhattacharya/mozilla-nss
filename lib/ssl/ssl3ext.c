@@ -466,7 +466,14 @@ ssl3_ExtensionSenderCollectionInit(ssl3HelloSenderCollection *coll,
                          const ssl3HelloExtensionSender *builtin,
                          PRInt32 builtin_bytes) {
     coll->alloc_len = coll->len = builtin_bytes / sizeof(*builtin);
-    coll->senders = PORT_Alloc(builtin_bytes);
+    if (builtin_bytes > 0) {
+        coll->senders = PORT_Alloc(builtin_bytes);
+    } else {
+        // We won't use the space for now, but we still want
+        // a non-null return value so we know it is inited.
+        // TODO Hacky. Add an inited flag instead?
+        coll->senders = PORT_Alloc(1);
+    }
     PORT_Memcpy(coll->senders, builtin, builtin_bytes);
 }
 
@@ -1899,6 +1906,7 @@ ssl3_RegisterServerHelloExtensionSender(void *context, sslSocket *ss, PRUint16 e
     new_sender.ex_type   = ex_type;
     new_sender.ex_sender = cb;
     new_sender.context = context;
+    ssl3_ExtensionSenderCollectionEnsureInited(&ss->xtnData.serverSenders, NULL, 0);
     ssl3_ExtensionSenderCollectionAppend(&ss->xtnData.serverSenders, &new_sender);
     return SECSuccess;
 }
@@ -2458,6 +2466,10 @@ SSL_SetCustomClientHelloTLS(PRInt32 ex_type,
     sender.ex_type = ex_type;
     sender.ex_sender = hello_sender;
     sender.context = sender_context;
+            ssl3_ExtensionSenderCollectionEnsureInited(&clientHelloSendersTLS,
+                                                       builtinClientHelloSendersTLS,
+                                                       sizeof(builtinClientHelloSendersTLS));
+
     ssl3_ExtensionSenderCollectionAppend(&clientHelloSendersTLS, &sender);
 
     ssl3CustomHelloExtensionHandler handler;
