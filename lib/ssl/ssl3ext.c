@@ -46,7 +46,7 @@ static SECStatus ssl3_GetSessionTicketKeys(const unsigned char **aes_key,
     PRUint32 *aes_key_length, const unsigned char **mac_key,
     PRUint32 *mac_key_length);
 #endif
-static PRInt32 ssl3_SendRenegotiationInfoXtn(void *context, PRFileDesc *fd,
+static PRInt32 ssl3_SendRenegotiationInfoXtn(void *context, SSL_Socket *fd,
                                              PRBool append, PRUint32 maxBytes);
 static SECStatus ssl3_HandleRenegotiationInfoXtn(sslSocket *ss, 
     PRUint16 ex_type, SECItem *data);
@@ -54,20 +54,20 @@ static SECStatus ssl3_ClientHandleNextProtoNegoXtn(sslSocket *ss,
 			PRUint16 ex_type, SECItem *data);
 static SECStatus ssl3_ServerHandleNextProtoNegoXtn(sslSocket *ss,
 			PRUint16 ex_type, SECItem *data);
-static PRInt32 ssl3_ClientSendNextProtoNegoXtn(void *context, PRFileDesc *fd,
+static PRInt32 ssl3_ClientSendNextProtoNegoXtn(void *context, SSL_Socket *fd,
                                                PRBool append, PRUint32 maxBytes);
-static PRInt32 ssl3_SendUseSRTPXtn(void *context, PRFileDesc *fd,
+static PRInt32 ssl3_SendUseSRTPXtn(void *context, SSL_Socket *fd,
                                    PRBool append, PRUint32 maxBytes);
 static SECStatus ssl3_HandleUseSRTPXtn(sslSocket * ss, PRUint16 ex_type,
     SECItem *data);
-static SECStatus ssl3_ServerSendStatusRequestXtn(void *context, PRFileDesc *fd,
+static SECStatus ssl3_ServerSendStatusRequestXtn(void *context, SSL_Socket *fd,
                                                  PRBool append, PRUint32 maxBytes);
 static SECStatus ssl3_ClientHandleStatusRequestXtn(sslSocket *ss,
                                                    PRUint16 ex_type,
                                                    SECItem *data);
-static PRInt32 ssl3_ClientSendStatusRequestXtn(void *context, PRFileDesc *fd, PRBool append,
+static PRInt32 ssl3_ClientSendStatusRequestXtn(void *context, SSL_Socket *fd, PRBool append,
                                                PRUint32 maxBytes);
-static PRInt32 ssl3_ClientSendSigAlgsXtn(void *context, PRFileDesc *fd, PRBool append,
+static PRInt32 ssl3_ClientSendSigAlgsXtn(void *context, SSL_Socket *fd, PRBool append,
                                          PRUint32 maxBytes);
 static SECStatus ssl3_ServerHandleSigAlgsXtn(sslSocket *ss, PRUint16 ex_type,
                                              SECItem *data);
@@ -532,10 +532,10 @@ ssl3_ClientExtensionAdvertised(sslSocket *ss, PRUint16 ex_type) {
  * Used by client and server.
  */
 PRInt32
-ssl3_SendServerNameXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_SendServerNameXtn(void *context, SSL_Socket *fd, PRBool append,
                        PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     SECStatus rv;
@@ -691,10 +691,10 @@ loser:
  * sends an empty ticket.  Servers always send empty tickets.
  */
 PRInt32
-ssl3_SendSessionTicketXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_SendSessionTicketXtn(void *context, SSL_Socket *fd, PRBool append,
                           PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     PRInt32 extension_length;
@@ -852,10 +852,10 @@ ssl3_ClientHandleNextProtoNegoXtn(sslSocket *ss, PRUint16 ex_type,
 }
 
 static PRInt32
-ssl3_ClientSendNextProtoNegoXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_ClientSendNextProtoNegoXtn(void *context, SSL_Socket *fd, PRBool append,
                                 PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     PRInt32 extension_length;
@@ -901,10 +901,10 @@ ssl3_ClientHandleStatusRequestXtn(sslSocket *ss, PRUint16 ex_type,
 }
 
 static PRInt32
-ssl3_ServerSendStatusRequestXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_ServerSendStatusRequestXtn(void *context, SSL_Socket *fd, PRBool append,
                                 PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     PRInt32 extension_length;
@@ -944,10 +944,10 @@ ssl3_ServerSendStatusRequestXtn(void *context, PRFileDesc *fd, PRBool append,
 /* ssl3_ClientSendStatusRequestXtn builds the status_request extension on the
  * client side. See RFC 4366 section 3.6. */
 static PRInt32
-ssl3_ClientSendStatusRequestXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_ClientSendStatusRequestXtn(void *context, SSL_Socket *fd, PRBool append,
                                 PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     PRInt32 extension_length;
@@ -1957,10 +1957,10 @@ ssl3_CallHelloExtensionSenders(sslSocket *ss, PRBool append, PRUint32 maxBytes,
  * Verify Data (SSL): 36 bytes (client) or 72 bytes (server)
  */
 static PRInt32 
-ssl3_SendRenegotiationInfoXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_SendRenegotiationInfoXtn(void *context, SSL_Socket *fd, PRBool append,
                        PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     PRInt32 len, needed;
@@ -2042,10 +2042,10 @@ ssl3_HandleRenegotiationInfoXtn(sslSocket *ss, PRUint16 ex_type, SECItem *data)
 }
 
 static PRInt32
-ssl3_SendUseSRTPXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_SendUseSRTPXtn(void *context, SSL_Socket *fd, PRBool append,
                     PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     PRUint32 ext_data_len;
@@ -2322,10 +2322,10 @@ ssl3_ServerHandleSigAlgsXtn(sslSocket * ss, PRUint16 ex_type, SECItem *data)
 /* ssl3_ClientSendSigAlgsXtn sends the signature_algorithm extension for TLS
  * 1.2 ClientHellos. */
 static PRInt32
-ssl3_ClientSendSigAlgsXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_ClientSendSigAlgsXtn(void *context, SSL_Socket *fd, PRBool append,
                                 PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     static const unsigned char signatureAlgorithms[] = {
@@ -2394,7 +2394,7 @@ ssl3_ExtInit() {
 SECStatus
 SSL_AppendHandshake(PRFileDesc *fd, const void *void_src,
                     PRInt32 bytes) {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshake(ss, void_src, bytes);
@@ -2402,7 +2402,7 @@ SSL_AppendHandshake(PRFileDesc *fd, const void *void_src,
 SECStatus
 SSL_AppendHandshakeHeader(PRFileDesc *fd,
                           SSL3HandshakeType t, PRUint32 length) {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshakeHeader(ss, t, length);
@@ -2410,7 +2410,7 @@ SSL_AppendHandshakeHeader(PRFileDesc *fd,
 
 SECStatus
 SSL_AppendHandshakeNumber(PRFileDesc *fd, PRInt32 num, PRInt32 lenSize) {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshakeNumber(ss, num, lenSize);
@@ -2418,7 +2418,7 @@ SSL_AppendHandshakeNumber(PRFileDesc *fd, PRInt32 num, PRInt32 lenSize) {
 SECStatus
 SSL_AppendHandshakeVariable(PRFileDesc *fd, const SSL3Opaque *src,
                             PRInt32 bytes, PRInt32 lenSize) {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_AppendHandshakeVariable(ss, src, bytes, lenSize);
@@ -2427,7 +2427,7 @@ SSL_AppendHandshakeVariable(PRFileDesc *fd, const SSL3Opaque *src,
 SECStatus
 SSL_ConsumeHandshake(PRFileDesc *fd, void *v, PRInt32 bytes,
                      SSL3Opaque **b, PRUint32 *length) {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_ConsumeHandshake(ss, v, bytes, b, length);
@@ -2435,7 +2435,7 @@ SSL_ConsumeHandshake(PRFileDesc *fd, void *v, PRInt32 bytes,
 PRInt32
 SSL_ConsumeHandshakeNumber(PRFileDesc *fd, PRInt32 bytes,
                            SSL3Opaque **b, PRUint32 *length) {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_ConsumeHandshakeNumber(ss, bytes, b, length);
@@ -2443,7 +2443,7 @@ SSL_ConsumeHandshakeNumber(PRFileDesc *fd, PRInt32 bytes,
 SECStatus
 SSL_ConsumeHandshakeVariable(PRFileDesc *fd, SECItem *i, PRInt32 bytes,
                              SSL3Opaque **b, PRUint32 *length) {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     return ssl3_ConsumeHandshakeVariable(fd, i, bytes, b, length);
@@ -2487,7 +2487,7 @@ SSL_SetCustomClientHelloTLS(PRInt32 ex_type,
 SECStatus SSL_RegisterServerHelloExtensionSender(void *context, PRFileDesc *fd,
                                                  PRUint16 ex_type,
                                                  SSL_HelloExtensionSenderFunc sender) {
-    return ssl3_RegisterServerHelloExtensionSender(context, ssl_FindSocket(fd),
+    return ssl3_RegisterServerHelloExtensionSender(context, ssl_UnpackSocket(fd),
                                                    ex_type, sender);
 }
 

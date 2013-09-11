@@ -1092,10 +1092,10 @@ ssl3_SuiteBOnly(sslSocket *ss)
  * which says that we support all TLS-defined named curves.
  */
 PRInt32
-ssl3_SendSupportedCurvesXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_SendSupportedCurvesXtn(void *context, SSL_Socket *fd, PRBool append,
                        PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     PRInt32 ecListSize = 0;
@@ -1138,10 +1138,10 @@ ssl3_GetSupportedECCurveMask(sslSocket *ss)
  * which says that we only support uncompressed points.
  */
 PRInt32
-ssl3_SendSupportedCurvesXtn(void *context, PRFileDesc *fd, PRBool append,
+ssl3_SendSupportedCurvesXtn(void *context, SSL_Socket *fd, PRBool append,
                        PRUint32 maxBytes)
 {
-    sslSocket *ss = ssl_FindSocket(fd);
+    sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
     if (!ss || !ssl3_IsECCEnabled(ss))

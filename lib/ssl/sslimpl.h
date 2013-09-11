@@ -170,6 +170,18 @@ typedef struct ssl3BulkCipherDefStr     ssl3BulkCipherDef;
 typedef struct ssl3MACDefStr            ssl3MACDef;
 typedef struct ssl3KeyPairStr		ssl3KeyPair;
 
+
+// TODO make this opaque to client libs but available to them.
+typedef struct {
+    sslSocket *ss;
+} SSL_Socket;
+
+sslSocket *
+ssl_UnpackSocket(SSL_Socket *sock);
+SSL_Socket *
+ssl_EncapsulateSocket(sslSocket *ss);
+
+
 struct ssl3CertNodeStr {
     struct ssl3CertNodeStr *next;
     CERTCertificate *       cert;
@@ -195,7 +207,7 @@ typedef sslSessionID *(*sslSessionIDLookupFunc)(const PRIPv6Addr    *addr,
 /* registerable callback function that either appends extension to buffer
  * or returns length of data that it would have appended.
  */
-typedef PRInt32 (*SSL_HelloExtensionSenderFunc)(void *context, PRFileDesc *fd,
+typedef PRInt32 (*SSL_HelloExtensionSenderFunc)(void *context, SSL_Socket *fd,
 						 PRBool append, PRUint32 maxBytes);
 
 /* registerable callback function that handles a received extension, 
@@ -1713,13 +1725,13 @@ extern SECStatus ssl3_ServerHandleSessionTicketXtn(sslSocket *ss,
  * Note that not all extension senders are exposed here; only those that
  * that need exposure.
  */
-extern PRInt32 ssl3_SendSessionTicketXtn(void *context, PRFileDesc *fd, PRBool append,
+extern PRInt32 ssl3_SendSessionTicketXtn(void *context, SSL_Socket *fd, PRBool append,
                                          PRUint32 maxBytes);
 
 /* ClientHello and ServerHello extension senders.
  * The code is in ssl3ext.c.
  */
-extern PRInt32 ssl3_SendServerNameXtn(void *context, PRFileDesc *fd, PRBool append,
+extern PRInt32 ssl3_SendServerNameXtn(void *context, SSL_Socket *fd, PRBool append,
                                       PRUint32 maxBytes);
 
 /* Assigns new cert, cert chain and keys to ss->serverCerts
@@ -1731,6 +1743,7 @@ extern SECStatus ssl_ConfigSecureServer(sslSocket *ss, CERTCertificate *cert,
                                         ssl3KeyPair *keyPair, SSLKEAType kea);
 
 #ifdef NSS_ENABLE_ECC
+// TODO FIX
 extern PRInt32 ssl3_SendSupportedCurvesXtn(sslSocket *ss,
 			PRBool append, PRUint32 maxBytes);
 extern PRInt32 ssl3_SendSupportedPointFormatsXtn(sslSocket *ss,
@@ -1888,5 +1901,7 @@ extern int __cdecl _getpid(void);
 
 void uint16ArrayInit(Uint16Array *arr);
 void uint16ArrayAppend(Uint16Array *arr, PRUint16 new_data);
+
+
 
 #endif /* __sslimpl_h_ */
