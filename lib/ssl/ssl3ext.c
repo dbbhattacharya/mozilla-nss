@@ -1938,7 +1938,7 @@ ssl3_CallHelloExtensionSenders(sslSocket *ss, PRBool append, PRUint32 maxBytes,
 
     for (i = 0; i < senders->len; ++i, ++sender) {
 	if (sender->ex_sender) {
-	    PRInt32 extLen = (*sender->ex_sender)(sender->context, ss->fd, append, maxBytes);
+	    PRInt32 extLen = (*sender->ex_sender)(sender->context, ssl_EncapsulateSocket(ss), append, maxBytes);
 	    if (extLen < 0)
 	    	return -1;
 	    maxBytes        -= extLen;
@@ -2484,7 +2484,7 @@ SSL_SetCustomClientHelloTLS(PRInt32 ex_type,
 /* Register a ServerHello extension sender for the TLS connection associated
    with fd.
  */
-SECStatus SSL_RegisterServerHelloExtensionSender(void *context, PRFileDesc *fd,
+SECStatus SSL_RegisterServerHelloExtensionSender(void *context, SSL_Socket *fd,
                                                  PRUint16 ex_type,
                                                  SSL_HelloExtensionSenderFunc sender) {
     return ssl3_RegisterServerHelloExtensionSender(context, ssl_UnpackSocket(fd),
