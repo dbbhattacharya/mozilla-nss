@@ -182,15 +182,15 @@ ssl_FindSocket(PRFileDesc *fd)
 }
 
 sslSocket *
-ssl_UnpackSocket(SSL_Socket *sock) {
-    return sock->ss;
+ssl_UnpackSocket(SSL_Socket sock) {
+    return sock;
 }
 
 // TODO avod malloc?
-SSL_Socket *
+SSL_Socket 
 ssl_EncapsulateSocket(sslSocket *ss) {
-    SSL_Socket *sock = PORT_Alloc(sizeof(sock));
-    sock->ss = ss;
+    //SSL_Socket sock = PORT_Alloc(sizeof(sock));
+    //sock->ss = ss;
     return ss;
 }
 

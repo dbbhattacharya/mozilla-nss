@@ -172,13 +172,12 @@ typedef struct ssl3KeyPairStr		ssl3KeyPair;
 
 
 // TODO make this opaque to client libs but available to them.
-typedef struct {
-    sslSocket *ss;
-} SSL_Socket;
+typedef sslSocket* SSL_Socket;
 
 sslSocket *
-ssl_UnpackSocket(SSL_Socket *sock);
-SSL_Socket *
+ssl_UnpackSocket(SSL_Socket sock);
+
+SSL_Socket 
 ssl_EncapsulateSocket(sslSocket *ss);
 
 
@@ -207,7 +206,7 @@ typedef sslSessionID *(*sslSessionIDLookupFunc)(const PRIPv6Addr    *addr,
 /* registerable callback function that either appends extension to buffer
  * or returns length of data that it would have appended.
  */
-typedef PRInt32 (*SSL_HelloExtensionSenderFunc)(void *context, SSL_Socket *fd,
+typedef PRInt32 (*SSL_HelloExtensionSenderFunc)(void *context, SSL_Socket fd,
 						 PRBool append, PRUint32 maxBytes);
 
 /* registerable callback function that handles a received extension, 
@@ -1725,13 +1724,13 @@ extern SECStatus ssl3_ServerHandleSessionTicketXtn(sslSocket *ss,
  * Note that not all extension senders are exposed here; only those that
  * that need exposure.
  */
-extern PRInt32 ssl3_SendSessionTicketXtn(void *context, SSL_Socket *fd, PRBool append,
+extern PRInt32 ssl3_SendSessionTicketXtn(void *context, SSL_Socket fd, PRBool append,
                                          PRUint32 maxBytes);
 
 /* ClientHello and ServerHello extension senders.
  * The code is in ssl3ext.c.
  */
-extern PRInt32 ssl3_SendServerNameXtn(void *context, SSL_Socket *fd, PRBool append,
+extern PRInt32 ssl3_SendServerNameXtn(void *context, SSL_Socket fd, PRBool append,
                                       PRUint32 maxBytes);
 
 /* Assigns new cert, cert chain and keys to ss->serverCerts
