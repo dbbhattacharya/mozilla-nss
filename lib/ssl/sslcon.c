@@ -3119,6 +3119,8 @@ ssl2_BeginClientHandshake(sslSocket *ss)
      * been called, which ssl3_StartHandshakeHash took care for us above.
      */
     xtnData = &ss->xtnData;
+#include <stdio.h>
+printf("Change 52\n");
     uint16ArrayAppend(&xtnData->advertised, ssl_renegotiation_info_xtn);
 
     /* Setup to receive servers hello message */

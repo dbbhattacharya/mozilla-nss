@@ -222,6 +222,8 @@ ssl3_GetSessionTicketKeys(const unsigned char **aes_key,
 
 void
 uint16ArrayInit(Uint16Array *arr) {
+#include <stdio.h>
+printf("Change 6\n");
     arr->alloc_len = 4;
     arr->data = PORT_Alloc(arr->alloc_len * sizeof(*arr));
     arr->len = 0;
@@ -229,6 +231,8 @@ uint16ArrayInit(Uint16Array *arr) {
 
 void
 uint16ArrayAppend(Uint16Array *arr, PRUint16 new_data) {
+#include <stdio.h>
+printf("Change 7\n");
     if (arr->alloc_len == arr->len) {
         arr->alloc_len *= 2;
         arr->data = PORT_Realloc(arr->data, arr->alloc_len * sizeof(*arr));
@@ -319,6 +323,8 @@ ssl3HelloSenderCollection clientHelloSendersSSL3 = { NULL, -1, -1 };
 /* Initialize coll, whose builtin must already be populated. */
 static void
 hello_extension_collection_init(ssl3HelloExtensionHandlerCollection *coll) {
+#include <stdio.h>
+printf("Change 8\n");
     int i;
     for (i = 0; coll->builtin_handlers[i].ex_type > 0; i++) {
         // Counting how many there are
@@ -329,12 +335,16 @@ hello_extension_collection_init(ssl3HelloExtensionHandlerCollection *coll) {
 /* Returns PR_TRUE if coll has had _init called, else PR_FALSE */
 static PRBool
 hello_extension_collection_is_inited(ssl3HelloExtensionHandlerCollection *coll) {
+#include <stdio.h>
+printf("Change 9\n");
     return coll->builtin_len == -1;
 }
 
 /* Init if not already inited */
 static void
 hello_extension_collection_ensure_inited(ssl3HelloExtensionHandlerCollection *coll) {
+#include <stdio.h>
+printf("Change 10\n");
     if (hello_extension_collection_is_inited(coll)) {
         hello_extension_collection_init(coll);
     }
@@ -344,6 +354,8 @@ hello_extension_collection_ensure_inited(ssl3HelloExtensionHandlerCollection *co
 static void
 hello_extension_collection_append(ssl3HelloExtensionHandlerCollection *coll,
                                   ssl3CustomHelloExtensionHandler *handler) {
+#include <stdio.h>
+printf("Change 11\n");
     // Make sure we have space to append.
     if (coll->custom_len == 0) {
         // custom_handlers is NULL. allocate it
@@ -363,6 +375,8 @@ hello_extension_collection_append(ssl3HelloExtensionHandlerCollection *coll,
 /* Frees memory allocated on behalf of coll, but does not free coll itself */
 static void
 hello_extension_collection_destroy(ssl3HelloExtensionHandlerCollection *coll) {
+#include <stdio.h>
+printf("Change 12\n");
     if (coll->custom_handlers != NULL) {
         free(coll->custom_handlers);
     }
@@ -392,6 +406,8 @@ typedef struct {
 static void
 hello_extension_collection_iterator(ssl3HelloExtensionHandlerCollectionIterator *iter,
                                     ssl3HelloExtensionHandlerCollection *coll) {
+#include <stdio.h>
+printf("Change 13\n");
     iter->coll = coll;
     hello_extension_collection_ensure_inited(iter->coll);
     // Start with the builtin ones, if there are any.
@@ -402,6 +418,8 @@ hello_extension_collection_iterator(ssl3HelloExtensionHandlerCollectionIterator 
 /* Returns PR_TRUE if iter has more handlers to return, else PR_FALSE */
 static PRBool
 hello_extension_collection_iterator_has_next(ssl3HelloExtensionHandlerCollectionIterator *iter) {
+#include <stdio.h>
+printf("Change 14\n");
     if (iter->on_builtin) {
         // onBuiltin will only be true if there are builtin handlers and we
         // haven't returned the last one.
@@ -415,6 +433,8 @@ hello_extension_collection_iterator_has_next(ssl3HelloExtensionHandlerCollection
 static void
 hello_extension_collection_iterator_pop(ssl3AbstractHelloExtensionHandler *handler,
                                         ssl3HelloExtensionHandlerCollectionIterator *iter) {
+#include <stdio.h>
+printf("Change 15\n");
     PORT_Assert(hello_extension_collection_iterator_has_next(iter));
     if (iter->on_builtin) {
         handler->builtin = &iter->coll->builtin_handlers[iter->next_idx++];
@@ -434,12 +454,16 @@ hello_extension_collection_iterator_pop(ssl3AbstractHelloExtensionHandler *handl
 /* Returns true if builtin should be used, false if client_supplied should be used. */
 static PRBool
 abstract_extension_handler_is_builtin(ssl3AbstractHelloExtensionHandler *abstract_handler) {
+#include <stdio.h>
+printf("Change 16\n");
     return abstract_handler->is_builtin;
 }
 
 /* Returns the extension type number of handler */
 static PRInt32
 abstract_extension_handler_ex_type(ssl3AbstractHelloExtensionHandler *handler){
+#include <stdio.h>
+printf("Change 17\n");
     if (abstract_extension_handler_is_builtin(handler)) {
         return handler->builtin->ex_type;
     } else {
@@ -451,6 +475,8 @@ abstract_extension_handler_ex_type(ssl3AbstractHelloExtensionHandler *handler){
 static SECStatus
 abstract_extension_handler_call(ssl3AbstractHelloExtensionHandler *handler,
                                 sslSocket *ss, PRUint16 ex_type, SECItem *data) {
+#include <stdio.h>
+printf("Change 18\n");
     if (abstract_extension_handler_is_builtin(handler)) {
         return handler->builtin->ex_handler(ss, ex_type, data);
     } else {
@@ -465,6 +491,8 @@ static void
 ssl3_ExtensionSenderCollectionInit(ssl3HelloSenderCollection *coll,
                          const ssl3HelloExtensionSender *builtin,
                          PRInt32 builtin_bytes) {
+#include <stdio.h>
+printf("Change 19\n");
     coll->alloc_len = coll->len = builtin_bytes / sizeof(*builtin);
     if (builtin_bytes > 0) {
         coll->senders = PORT_Alloc(builtin_bytes);
@@ -482,6 +510,8 @@ static void
 ssl3_ExtensionSenderCollectionEnsureInited(ssl3HelloSenderCollection *coll,
                                            const ssl3HelloExtensionSender *builtin,
                                            PRInt32 builtin_bytes) {
+#include <stdio.h>
+printf("Change 20\n");
     if (coll->senders == NULL) {
         ssl3_ExtensionSenderCollectionInit(coll, builtin, builtin_bytes);
     }
@@ -491,6 +521,8 @@ ssl3_ExtensionSenderCollectionEnsureInited(ssl3HelloSenderCollection *coll,
 static void
 ssl3_ExtensionSenderCollectionAppend(ssl3HelloSenderCollection *coll,
                                      ssl3HelloExtensionSender* sender) {
+#include <stdio.h>
+printf("Change 21\n");
     PORT_Assert(coll->senders != NULL);
     if (coll->len == coll->alloc_len) {
         coll->alloc_len *= 2; // TODO if starts with 0 builtin, will fail.
@@ -505,6 +537,8 @@ ssl3_ExtensionSenderCollectionAppend(ssl3HelloSenderCollection *coll,
 static PRBool
 arrayContainsExtension(const PRUint16 *array, PRUint32 len, PRUint16 ex_type)
 {
+#include <stdio.h>
+printf("Change 22\n");
     int i;
     for (i = 0; i < len; i++) {
 	if (ex_type == array[i])
@@ -516,6 +550,8 @@ arrayContainsExtension(const PRUint16 *array, PRUint32 len, PRUint16 ex_type)
 PRBool
 ssl3_ExtensionNegotiated(sslSocket *ss, PRUint16 ex_type) {
     TLSExtensionData *xtnData = &ss->xtnData;
+#include <stdio.h>
+printf("Change 23\n");
     return arrayContainsExtension(xtnData->negotiated.data,
 	                          xtnData->negotiated.len, ex_type);
 }
@@ -523,6 +559,8 @@ ssl3_ExtensionNegotiated(sslSocket *ss, PRUint16 ex_type) {
 static PRBool
 ssl3_ClientExtensionAdvertised(sslSocket *ss, PRUint16 ex_type) {
     TLSExtensionData *xtnData = &ss->xtnData;
+#include <stdio.h>
+printf("Change 24\n");
     return arrayContainsExtension(xtnData->advertised.data,
 	                          xtnData->advertised.len, ex_type);
 }
@@ -535,6 +573,8 @@ PRInt32
 ssl3_SendServerNameXtn(void *context, SSL_Socket fd, PRBool append,
                        PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 25\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -677,6 +717,8 @@ ssl3_HandleServerNameXtn(sslSocket * ss, PRUint16 ex_type, SECItem *data)
     }
     xtnData->sniNameArr = names;
     xtnData->sniNameArrSize = namesPos;
+#include <stdio.h>
+printf("Change 26\n");
     uint16ArrayAppend(&xtnData->negotiated, ssl_server_name_xtn);
 
     return SECSuccess;
@@ -694,6 +736,8 @@ PRInt32
 ssl3_SendSessionTicketXtn(void *context, SSL_Socket fd, PRBool append,
                           PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 27\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -771,6 +815,8 @@ ssl3_ServerHandleNextProtoNegoXtn(sslSocket * ss, PRUint16 ex_type, SECItem *dat
 	return SECFailure;
     }
 
+#include <stdio.h>
+printf("Change 270\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
 
     /* TODO: server side NPN support would require calling
@@ -845,6 +891,8 @@ ssl3_ClientHandleNextProtoNegoXtn(sslSocket *ss, PRUint16 ex_type,
 	return SECFailure;
     }
 
+#include <stdio.h>
+printf("Change 28\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
 
     SECITEM_FreeItem(&ss->ssl3.nextProto, PR_FALSE);
@@ -855,6 +903,8 @@ static PRInt32
 ssl3_ClientSendNextProtoNegoXtn(void *context, SSL_Socket fd, PRBool append,
                                 PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 29\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -895,6 +945,8 @@ ssl3_ClientHandleStatusRequestXtn(sslSocket *ss, PRUint16 ex_type,
        return SECFailure;
 
     /* Keep track of negotiated extensions. */
+#include <stdio.h>
+printf("Change 30\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
 
     return SECSuccess;
@@ -904,6 +956,8 @@ static PRInt32
 ssl3_ServerSendStatusRequestXtn(void *context, SSL_Socket fd, PRBool append,
                                 PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 31\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -947,6 +1001,8 @@ static PRInt32
 ssl3_ClientSendStatusRequestXtn(void *context, SSL_Socket fd, PRBool append,
                                 PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 32\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -990,6 +1046,8 @@ ssl3_ClientSendStatusRequestXtn(void *context, SSL_Socket fd, PRBool append,
            return -1;
 
        xtnData = &ss->xtnData;
+#include <stdio.h>
+printf("Change 33\n");
        uint16ArrayAppend(&xtnData->advertised, ssl_cert_status_xtn);
      } else if (maxBytes < extension_length) {
        PORT_Assert(0);
@@ -1350,6 +1408,8 @@ ssl3_ClientHandleSessionTicketXtn(sslSocket *ss, PRUint16 ex_type,
 	return SECFailure;
 
     /* Keep track of negotiated extensions. */
+#include <stdio.h>
+printf("Change 34\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
     return SECSuccess;
 }
@@ -1369,6 +1429,8 @@ ssl3_ServerHandleSessionTicketXtn(sslSocket *ss, PRUint16 ex_type,
 	return SECSuccess;
 
     /* Keep track of negotiated extensions. */
+#include <stdio.h>
+printf("Change 35\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
 
     /* Parse the received ticket sent in by the client.  We are
@@ -1829,6 +1891,8 @@ ssl3_ParseEncryptedSessionTicket(sslSocket *ss, SECItem *data,
 SECStatus 
 ssl3_HandleHelloExtensions(sslSocket *ss, SSL3Opaque **b, PRUint32 *length)
 {
+#include <stdio.h>
+printf("Change 36\n");
     ssl3HelloExtensionHandlerCollection *handlers;
 
     if (ss->sec.isServer) {
@@ -1890,6 +1954,8 @@ SECStatus
 ssl3_RegisterServerHelloExtensionSender(void *context, sslSocket *ss, PRUint16 ex_type,
 				        SSL_HelloExtensionSenderFunc cb)
 {
+#include <stdio.h>
+printf("Change 37\n");
     int i;
     ssl3HelloExtensionSender *sender = &ss->xtnData.serverSenders.senders[0];
 
@@ -1916,6 +1982,8 @@ PRInt32
 ssl3_CallHelloExtensionSenders(sslSocket *ss, PRBool append, PRUint32 maxBytes,
                                const ssl3HelloSenderCollection *senders)
 {
+#include <stdio.h>
+printf("Change 38\n");
     PRInt32 total_exten_len = 0;
     int i;
 
@@ -1960,6 +2028,8 @@ static PRInt32
 ssl3_SendRenegotiationInfoXtn(void *context, SSL_Socket fd, PRBool append,
                        PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 39\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2002,6 +2072,8 @@ ssl3_ServerHandleStatusRequestXtn(sslSocket *ss, PRUint16 ex_type,
     SECStatus rv = SECSuccess;
 
     /* remember that we got this extension. */
+#include <stdio.h>
+printf("Change 40\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
     PORT_Assert(ss->sec.isServer);
     /* prepare to send back the appropriate response */
@@ -2032,6 +2104,8 @@ ssl3_HandleRenegotiationInfoXtn(sslSocket *ss, PRUint16 ex_type, SECItem *data)
     }
     /* remember that we got this extension and it was correct. */
     ss->peerRequestedProtection = 1;
+#include <stdio.h>
+printf("Change 41\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
     if (ss->sec.isServer) {
 	/* prepare to send back the appropriate response */
@@ -2045,6 +2119,8 @@ static PRInt32
 ssl3_SendUseSRTPXtn(void *context, SSL_Socket fd, PRBool append,
                     PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 42\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2184,6 +2260,8 @@ ssl3_HandleUseSRTPXtn(sslSocket * ss, PRUint16 ex_type, SECItem *data)
 	}
 
 	/* OK, this looks fine. */
+#include <stdio.h>
+printf("Change 43\n");
 	uint16ArrayAppend(&ss->xtnData.negotiated, ssl_use_srtp_xtn);
 	ss->ssl3.dtlsSRTPCipherSuite = cipher;
 	return SECSuccess;
@@ -2265,6 +2343,8 @@ ssl3_ServerHandleSigAlgsXtn(sslSocket * ss, PRUint16 ex_type, SECItem *data)
     }
 
     /* Keep track of negotiated extensions. */
+#include <stdio.h>
+printf("Change 44\n");
     uint16ArrayAppend(&ss->xtnData.negotiated, ex_type);
 
     rv = ssl3_ConsumeHandshakeVariable(ss, &algorithms, 2, &data->data,
@@ -2325,6 +2405,8 @@ static PRInt32
 ssl3_ClientSendSigAlgsXtn(void *context, SSL_Socket fd, PRBool append,
                                 PRUint32 maxBytes)
 {
+#include <stdio.h>
+printf("Change 45\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2384,6 +2466,8 @@ loser:
    Should only be called by ssl_Init. */
 void
 ssl3_ExtInit() {
+#include <stdio.h>
+printf("Change 46\n");
     hello_extension_collection_init(&serverHelloHandlersTLS);
     hello_extension_collection_init(&serverHelloHandlersSSL3);
 }
@@ -2394,6 +2478,8 @@ ssl3_ExtInit() {
 SECStatus
 SSL_AppendHandshake(SSL_Socket fd, const void *void_src,
                     PRInt32 bytes) {
+#include <stdio.h>
+printf("Not Reached?\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2402,6 +2488,8 @@ SSL_AppendHandshake(SSL_Socket fd, const void *void_src,
 SECStatus
 SSL_AppendHandshakeHeader(SSL_Socket fd,
                           SSL3HandshakeType t, PRUint32 length) {
+#include <stdio.h>
+printf("Not Reached?\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2410,6 +2498,8 @@ SSL_AppendHandshakeHeader(SSL_Socket fd,
 
 SECStatus
 SSL_AppendHandshakeNumber(SSL_Socket fd, PRInt32 num, PRInt32 lenSize) {
+#include <stdio.h>
+printf("Not Reached?\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2418,6 +2508,8 @@ SSL_AppendHandshakeNumber(SSL_Socket fd, PRInt32 num, PRInt32 lenSize) {
 SECStatus
 SSL_AppendHandshakeVariable(SSL_Socket fd, const SSL3Opaque *src,
                             PRInt32 bytes, PRInt32 lenSize) {
+#include <stdio.h>
+printf("Not Reached?\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2427,6 +2519,8 @@ SSL_AppendHandshakeVariable(SSL_Socket fd, const SSL3Opaque *src,
 SECStatus
 SSL_ConsumeHandshake(SSL_Socket fd, void *v, PRInt32 bytes,
                      SSL3Opaque **b, PRUint32 *length) {
+#include <stdio.h>
+printf("Not Reached?\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2435,6 +2529,8 @@ SSL_ConsumeHandshake(SSL_Socket fd, void *v, PRInt32 bytes,
 PRInt32
 SSL_ConsumeHandshakeNumber(SSL_Socket fd, PRInt32 bytes,
                            SSL3Opaque **b, PRUint32 *length) {
+#include <stdio.h>
+printf("Not Reached?\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2443,6 +2539,8 @@ SSL_ConsumeHandshakeNumber(SSL_Socket fd, PRInt32 bytes,
 SECStatus
 SSL_ConsumeHandshakeVariable(SSL_Socket fd, SECItem *i, PRInt32 bytes,
                              SSL3Opaque **b, PRUint32 *length) {
+#include <stdio.h>
+printf("Not Reached?\n");
     sslSocket *ss = ssl_UnpackSocket(fd);
     PORT_Assert(ss != NULL);
 
@@ -2462,6 +2560,8 @@ SSL_SetCustomClientHelloTLS(PRInt32 ex_type,
                             void *sender_context,
                             SSL_HelloExtensionHandlerFunc server_hello_handler,
                             void *handler_context) {
+#include <stdio.h>
+printf("Not Reached?\n");
     ssl3HelloExtensionSender sender;
     sender.ex_type = ex_type;
     sender.ex_sender = hello_sender;
@@ -2487,6 +2587,8 @@ SSL_SetCustomClientHelloTLS(PRInt32 ex_type,
 SECStatus SSL_RegisterServerHelloExtensionSender(void *context, SSL_Socket fd,
                                                  PRUint16 ex_type,
                                                  SSL_HelloExtensionSenderFunc sender) {
+#include <stdio.h>
+printf("Change 50\n");
     return ssl3_RegisterServerHelloExtensionSender(context, ssl_UnpackSocket(fd),
                                                    ex_type, sender);
 }
@@ -2506,6 +2608,8 @@ void
 SSL_SetCustomServerHello(PRInt32 ex_type, SSL_HelloExtensionHandlerFunc client_hello_handler,
                          void *context) {
 
+#include <stdio.h>
+printf("Change 51\n");
     ssl3CustomHelloExtensionHandler *handler = PORT_Alloc(sizeof(*handler));
     handler->ex_type = ex_type;
     handler->ex_handler = client_hello_handler;

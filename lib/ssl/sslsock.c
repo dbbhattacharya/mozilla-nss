@@ -2866,6 +2866,8 @@ ssl_NewSocket(PRBool makeLocks, SSLProtocolVariant protocolVariant)
 	ssl2_InitSocketCipherSuites(ss);
 	ssl3_InitSocketCipherSuites(ss);
 	PR_INIT_CLIST(&ss->ssl3.hs.lastMessageFlight);
+#include <stdio.h>
+printf("Change 53\n");
   uint16ArrayInit(&ss->xtnData.advertised);
   uint16ArrayInit(&ss->xtnData.negotiated);
 

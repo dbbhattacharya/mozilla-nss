@@ -5182,6 +5182,8 @@ ssl3_SendClientHello(sslSocket *ss, PRBool resending)
     if (ss->ssl3.hs.sendingSCSV) {
 	/* Since we sent the SCSV, pretend we sent empty RI extension. */
 	TLSExtensionData *xtnData = &ss->xtnData;
+#include <stdio.h>
+printf("Change 1\n");
         uint16ArrayAppend(&xtnData->advertised, ssl_renegotiation_info_xtn);
     }
 
@@ -7507,6 +7509,8 @@ ssl3_HandleClientHello(sslSocket *ss, SSL3Opaque *b, PRUint32 length)
      * resuming.)
      */
     if (ssl3_ExtensionNegotiated(ss, ssl_session_ticket_xtn) && sid == NULL) {
+#include <stdio.h>
+printf("Change 2\n");
 	ssl3_RegisterServerHelloExtensionSender(NULL, ss,
 	    ssl_session_ticket_xtn, ssl3_SendSessionTicketXtn);
     }
@@ -7964,6 +7968,8 @@ compression_found:
                 /* Need to tell the client that application has picked
                  * the name from the offered list and reconfigured the socket.
                  */
+#include <stdio.h>
+printf("Change 3\n");
                 ssl3_RegisterServerHelloExtensionSender(NULL, ss, ssl_server_name_xtn,
                                                         ssl3_SendServerNameXtn);
             } else {
@@ -8291,6 +8297,8 @@ ssl3_SendServerHello(sslSocket *ss)
 
     sid = ss->sec.ci.sid;
 
+#include <stdio.h>
+printf("Change 4\n");
     extensions_len = ssl3_CallHelloExtensionSenders(ss, PR_FALSE, maxBytes,
 					       &ss->xtnData.serverSenders);
     if (extensions_len > 0)
@@ -8349,6 +8357,8 @@ ssl3_SendServerHello(sslSocket *ss)
 	rv = ssl3_AppendHandshakeNumber(ss, extensions_len, 2);
 	if (rv != SECSuccess) 
 	    return rv;	/* err set by ssl3_SetupPendingCipherSpec */
+#include <stdio.h>
+printf("Change 5\n");
 	sent_len = ssl3_CallHelloExtensionSenders(ss, PR_TRUE, extensions_len,
 					   &ss->xtnData.serverSenders);
         PORT_Assert(sent_len == extensions_len);
