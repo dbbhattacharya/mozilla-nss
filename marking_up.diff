@@ -1,0 +1,98 @@
+commit 324d18cf0806350064555bfbc5ef3f2e06775f70
+Merge: 4f3c356 bdce9b0
+Author: Daniel Jackoway <danielj@matasano.com>
+Date:   Wed Sep 18 16:26:04 2013 -0700
+
+    WIP on master: 4f3c356 BUG 905387: Fix a typo in a comment by renaming "pk" to "privKey"
+
+diff --cc cmd/tstclnt/tstclnt.c
+index cd07457,cd07457..633d657
+--- a/cmd/tstclnt/tstclnt.c
++++ b/cmd/tstclnt/tstclnt.c
+@@@ -473,10 -473,10 +473,13 @@@ verifyFromSideChannel(CERTCertificate *
+          sca->requireDataForIntermediates ? revTestsOverallHardFail : revTestsDoNotCheck;
+      rv = CERT_PKIXVerifyCert(cert, certificateUsageSSLServer,
+                               cvin, cvout, NULL);
+++    // why failing here?
+      if (rv == SECSuccess) {
+          sca->sideChannelRevocationTestResultCode = 
+              EXIT_CODE_SIDECHANNELTEST_GOOD;
+          return;
+++    } else {
+++        printf("Error: %d\n", PORT_GetError());
+      }
+      
+      /* revocation checking, soft fail */
+@@@ -488,7 -488,7 +491,7 @@@
+                               cvin, cvout, NULL);
+      if (rv == SECSuccess) {
+          sca->sideChannelRevocationTestResultCode = 
+--            EXIT_CODE_SIDECHANNELTEST_NODATA;
+++            EXIT_CODE_SIDECHANNELTEST_NODATA; // seing this
+          return;
+      }
+      
+diff --cc lib/certdb/crl.c
+index 1551cd1,1551cd1..e158dd7
+--- a/lib/certdb/crl.c
++++ b/lib/certdb/crl.c
+@@@ -2686,6 -2686,6 +2686,7 @@@ cert_CheckCertRevocationStatus(CERTCert
+              if (SECFailure == rv)
+              {
+                  SECStatus rv2 = CERT_FindCRLEntryReasonExten(entry, &reason);
+++                printf("crl.c\n");
+                  PORT_SetError(SEC_ERROR_REVOKED_CERTIFICATE);
+              }
+              break;
+diff --cc lib/certhigh/certvfy.c
+index f364ceb,f364ceb..b72f793
+--- a/lib/certhigh/certvfy.c
++++ b/lib/certhigh/certvfy.c
+@@@ -808,6 -808,6 +808,7 @@@ CERT_VerifyCACertForUsage(CERTCertDBHan
+              if (issuerCert) {
+                  if (SEC_CheckCRL(handle, cert, issuerCert, t, wincx) 
+  		    != SECSuccess) {
+++                    printf("certvfy.c\n");
+                      PORT_SetError(SEC_ERROR_REVOKED_CERTIFICATE);
+                      CERT_DestroyCertificate(issuerCert);
+                      goto loser;
+diff --cc lib/certhigh/certvfypkix.c
+index 4a6859c,4a6859c..d650895
+--- a/lib/certhigh/certvfypkix.c
++++ b/lib/certhigh/certvfypkix.c
+@@@ -2188,6 -2188,6 +2188,7 @@@ do 
+          goto cleanup;
+      }
+  
+++    // fails here
+      error = PKIX_BuildChain( procParams, &nbioContext,
+                               &buildState, &buildResult, &verifyNode,
+                               plContext);
+diff --cc lib/libpkix/pkix/top/pkix_build.c
+index c35163a,c35163a..c473a1c
+--- a/lib/libpkix/pkix/top/pkix_build.c
++++ b/lib/libpkix/pkix/top/pkix_build.c
+@@@ -3776,6 -3776,6 +3776,7 @@@ PKIX_BuildChain
+          void *nbioContext = NULL;
+  
+          PKIX_ENTER(BUILD, "PKIX_BuildChain");
+++        // fails here
+          PKIX_NULLCHECK_FOUR(procParams, pNBIOContext, pState, pBuildResult);
+  
+          nbioContext = *pNBIOContext;
+diff --cc tests/ocsp/ocsp.sh
+index d6603ed,d6603ed..b7671e6
+--- a/tests/ocsp/ocsp.sh
++++ b/tests/ocsp/ocsp.sh
+@@@ -113,6 -113,6 +113,10 @@@ ocsp_stapling(
+  }
+  
+  ################## main #################################################
+++BASEDIR=`pwd`
+  ocsp_init
+  ocsp_iopr_run
+--ocsp_stapling
+++#ocsp_stapling
+++gdb ${BINDIR}/tstclnt -x $BASEDIR/.gdbinit
+++# -V tls1.0: -T -v -F -M 1 -O -h kuix.de -p 5143 -d . < /Users/dj/isolated/nss/tests/ssl/sslreq.dat
+++ #${REQF}

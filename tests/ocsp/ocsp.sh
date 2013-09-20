@@ -113,6 +113,9 @@ ocsp_stapling()
 }
 
 ################## main #################################################
+BASEDIR=`pwd`
 ocsp_init
-ocsp_iopr_run
-ocsp_stapling
+#ocsp_iopr_run
+#ocsp_stapling
+gdb ${BINDIR}/tstclnt -x $BASEDIR/gdb2
+#-V tls1.0: -T -v -F -M 1 -O -h kuix.de -p 5143 -d . < ${REQF}

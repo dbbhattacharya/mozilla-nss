@@ -512,11 +512,13 @@ ownAuthCertificate(void *arg, PRFileDesc *fd, PRBool checkSig,
                                        fd, checkSig, isServer);
         }
 
+        // IMPORTANT
         /* No verification attempt must have happened before now,
          * to ensure revocation data has been actively retrieved yet,
          * or our test will produce incorrect results.
          */
 
+        printf("%p\n", fd);
         cert = SSL_RevealCert(fd);
         if (!cert) {
             exit(254);

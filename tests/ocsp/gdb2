@@ -1,0 +1,5 @@
+b main
+b ownAuthCertificate
+b ssl3_GatherCompleteHandshake
+b ssl3_HandleCertificate
+run -V tls1.0: -T -v -F -M 1 -O -h kuix.de -p 5143 -d . < /Users/dj/isolated/nss/tests/ssl/sslreq.dat

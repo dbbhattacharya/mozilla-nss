@@ -1315,6 +1315,17 @@ pkix_Build_ValidateEntireChain(
         PKIX_VerifyNode *verifyNode,
         void *plContext)
 {
+#include <execinfo.h>
+        int frames = 20;
+        void *buf[frames];
+        backtrace(buf, frames);
+        char **syms = backtrace_symbols(buf, frames);
+        int i;
+        for (i = 0; i < frames; i++) {
+            printf("%s\n", syms[i]);
+        }
+
+
         PKIX_UInt32 numChainCerts = 0;
         PKIX_PL_PublicKey *subjPubKey = NULL;
         PKIX_PolicyNode *policyTree = NULL;
